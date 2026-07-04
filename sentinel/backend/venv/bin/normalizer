@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/Users/kishansah/Create a data intelligence tool people would actually use, and show how acceleration helps them make a faster or better decision./sentinel/backend/venv/bin/python3" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from charset_normalizer.cli import cli_detect
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(cli_detect())
