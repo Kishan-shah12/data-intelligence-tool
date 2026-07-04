@@ -15,6 +15,18 @@ The entire investigation is powered by **Google's Gemini 2.5 Flash** (via Vertex
 
 ---
 
+## 🔴 The Problem
+During high-velocity e-commerce events (like flash sales or ticket releases), sophisticated fraud rings and bot networks execute thousands of coordinated attacks. Security analysts are overwhelmed by massive, fragmented transaction logs containing millions of rows. Traditional tools take hours to query and trace connections (like shared IPs or device IDs) across these massive datasets, meaning analysts are too slow to block the fraud before the financial damage is done.
+
+## 🟢 The Solution
+**Sentinel** is a real-time, decision-support dashboard built to cut investigation time from hours down to milliseconds. 
+
+It solves the speed problem by utilizing **NVIDIA's `cudf.pandas`**—a zero-code-change accelerator that pushes massive Python data processing directly to GPUs, filtering millions of transaction rows instantly. It then solves the complexity problem by passing the resulting threat graph to **Google's Gemini 2.5 AI**, which acts as a virtual junior analyst to instantly read the graph and generate a human-readable, actionable executive summary. 
+
+By combining GPU-accelerated data filtering with Generative AI synthesis, Sentinel empowers security teams to understand the entire "blast radius" of a threat in a single glance and make immediate, confident decisions.
+
+---
+
 ## 🏗️ High-Level Architecture
 
 Sentinel is split into three main operational zones: the **Data Pipeline**, the **Backend API**, and the **Frontend Dashboard**.
