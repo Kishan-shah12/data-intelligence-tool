@@ -19,5 +19,6 @@ COPY --from=builder /app/public ./public
 
 ENV PORT=8080
 ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
 
 CMD ["node", "server.js"]
