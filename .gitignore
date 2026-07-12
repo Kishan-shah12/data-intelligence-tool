@@ -1,0 +1,10 @@
+# Environment variables
+*.env
+.env
+.env.*
+!.env.example
+
+.DS_Store
+venv/
+__pycache__/
+*.pyc

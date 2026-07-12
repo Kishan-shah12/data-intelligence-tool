@@ -19,11 +19,14 @@ app.add_middleware(
 )
 
 try:
-    # Use Vertex AI seamlessly via Application Default Credentials
-    gemini_client = genai.Client(vertexai=True, project="data-intelligence-tool", location="us-central1")
+    if os.environ.get("GEMINI_API_KEY"):
+        gemini_client = genai.Client()
+    else:
+        # Use Vertex AI seamlessly via Application Default Credentials
+        gemini_client = genai.Client(vertexai=True, project="data-intelligence-tool", location="us-central1")
 except Exception as e:
     gemini_client = None
-    print(f"Warning: Gemini Client (Vertex AI) could not be initialized: {e}")
+    print(f"Warning: Gemini Client could not be initialized: {e}")
 
 class NetworkResponse(BaseModel):
     device_id: str
