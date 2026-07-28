@@ -30,6 +30,17 @@ except Exception as e:
     gemini_client = None
     print(f"Warning: Gemini Client could not be initialized: {e}")
 
+# --- GLOBALLY CACHE THE DATA TO PREVENT OUT-OF-MEMORY AND TIMEOUTS ---
+try:
+    print("Loading datasets into memory...")
+    threats_df = pd.read_parquet("../data/processed_threat_networks.parquet")
+    raw_df = pd.read_parquet("../data/raw_transactions")
+    print("Datasets loaded successfully.")
+except Exception as e:
+    print(f"Warning: Data could not be loaded on startup: {e}")
+    threats_df = None
+    raw_df = None
+
 class NetworkResponse(BaseModel):
     device_id: str
     network_data: dict
@@ -41,15 +52,10 @@ async def root():
 
 @app.get("/api/investigate/{device_id}", response_model=NetworkResponse)
 async def investigate_network(device_id: str):
-    # --- DYNAMIC DATA LOADING ---
-    try:
-        # Load the mock PySpark output and the raw data
-        threats_df = pd.read_parquet("../data/processed_threat_networks.parquet")
-        raw_df = pd.read_parquet("../data/raw_transactions")
-    except FileNotFoundError:
+    if threats_df is None or raw_df is None:
         raise HTTPException(
             status_code=500, 
-            detail="Parquet files not found. Ensure the data processing pipeline ran and paths are correct."
+            detail="Parquet files not found or failed to load. Ensure the data processing pipeline ran and paths are correct."
         )
 
     # Filter for the requested device
