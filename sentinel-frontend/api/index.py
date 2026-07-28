@@ -18,8 +18,8 @@ app.add_middleware(
 try:
     if os.environ.get("GEMINI_API_KEY"):
         gemini_client = genai.Client()
-    elif os.environ.get("K_SERVICE") or os.environ.get("VERCEL"): 
-        # Fallback to Vertex AI if running on Cloud Run or Vercel (if properly configured)
+    elif os.environ.get("K_SERVICE"): 
+        # Fallback to Vertex AI if running on Cloud Run (which has default credentials)
         gemini_client = genai.Client(vertexai=True, project="data-intelligence-tool", location="us-central1")
     else:
         gemini_client = None
