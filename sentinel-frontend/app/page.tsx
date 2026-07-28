@@ -16,7 +16,10 @@ export default function Dashboard() {
 
     try {
       const response = await fetch(`/api/investigate/${deviceId}`);
-      if (!response.ok) throw new Error("Device not found or API error.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `API returned status ${response.status}`);
+      }
       const result = await response.json();
       setData(result);
     } catch (err: any) {
