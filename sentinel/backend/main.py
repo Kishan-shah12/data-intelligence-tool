@@ -33,6 +33,10 @@ class NetworkResponse(BaseModel):
     network_data: dict
     ai_summary: str
 
+@app.get("/")
+async def root():
+    return {"status": "Sentinel API is running!", "docs": "Visit /docs for the API documentation."}
+
 @app.get("/api/investigate/{device_id}", response_model=NetworkResponse)
 async def investigate_network(device_id: str):
     # --- DYNAMIC DATA LOADING ---
