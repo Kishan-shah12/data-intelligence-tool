@@ -30,16 +30,9 @@ except Exception as e:
     gemini_client = None
     print(f"Warning: Gemini Client could not be initialized: {e}")
 
-# --- GLOBALLY CACHE THE DATA TO PREVENT OUT-OF-MEMORY AND TIMEOUTS ---
-try:
-    print("Loading datasets into memory...")
-    threats_df = pd.read_parquet("../data/processed_threat_networks.parquet")
-    raw_df = pd.read_parquet("../data/raw_transactions")
-    print("Datasets loaded successfully.")
-except Exception as e:
-    print(f"Warning: Data could not be loaded on startup: {e}")
-    threats_df = None
-    raw_df = None
+import pyarrow.dataset as ds
+
+# --- REMOVED GLOBAL CACHING TO PREVENT OOM ---
 
 class NetworkResponse(BaseModel):
     device_id: str
@@ -52,22 +45,26 @@ async def root():
 
 @app.get("/api/investigate/{device_id}", response_model=NetworkResponse)
 async def investigate_network(device_id: str):
-    if threats_df is None or raw_df is None:
+    # --- MEMORY-EFFICIENT DATA LOADING WITH PYARROW ---
+    try:
+        # Query the parquet files directly without loading them entirely into memory
+        dataset_threats = ds.dataset("../data/processed_threat_networks.parquet", format="parquet")
+        table_threats = dataset_threats.to_table(filter=ds.field("device_id") == device_id)
+        device_record = table_threats.to_pandas()
+        
+        dataset_raw = ds.dataset("../data/raw_transactions", format="parquet")
+        table_raw = dataset_raw.to_table(filter=ds.field("device_id") == device_id)
+        device_txns = table_raw.to_pandas().head(15)
+    except Exception as e:
         raise HTTPException(
             status_code=500, 
-            detail="Parquet files not found or failed to load. Ensure the data processing pipeline ran and paths are correct."
+            detail=f"Error reading dataset: {str(e)}"
         )
 
-    # Filter for the requested device
-    device_record = threats_df[threats_df['device_id'] == device_id]
-    
     if device_record.empty:
         raise HTTPException(status_code=404, detail="Device ID not flagged in the threat network.")
         
     record = device_record.iloc[0]
-    
-    # Get the raw transactions for this specific device to populate the UI table
-    device_txns = raw_df[raw_df['device_id'] == device_id].head(15)
 
     # Format the data to match what the React frontend expects
     data = {
