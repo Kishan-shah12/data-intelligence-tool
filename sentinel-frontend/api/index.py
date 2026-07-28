@@ -33,7 +33,7 @@ class NetworkResponse(BaseModel):
     ai_summary: str
 
 # Resolve paths correctly for Vercel
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 THREATS_PATH = os.path.join(DATA_DIR, "processed_threat_networks.parquet")
 TXNS_PATH = os.path.join(DATA_DIR, "raw_transactions", "**", "*.parquet")
 
