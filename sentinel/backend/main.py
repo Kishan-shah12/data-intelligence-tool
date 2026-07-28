@@ -21,9 +21,11 @@ app.add_middleware(
 try:
     if os.environ.get("GEMINI_API_KEY"):
         gemini_client = genai.Client()
-    else:
-        # Use Vertex AI seamlessly via Application Default Credentials
+    elif os.environ.get("K_SERVICE"): 
+        # Only use Vertex AI fallback if we are on Google Cloud Run
         gemini_client = genai.Client(vertexai=True, project="data-intelligence-tool", location="us-central1")
+    else:
+        gemini_client = None
 except Exception as e:
     gemini_client = None
     print(f"Warning: Gemini Client could not be initialized: {e}")
