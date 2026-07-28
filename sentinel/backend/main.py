@@ -98,7 +98,8 @@ async def investigate_network(device_id: str):
             )
             ai_summary = response.text
         except Exception as e:
-            ai_summary = f"Error generating summary: {str(e)}"
+            print(f"Error generating Gemini summary: {e}")
+            ai_summary = "Error generating summary."
 
     return {
         "device_id": device_id,
