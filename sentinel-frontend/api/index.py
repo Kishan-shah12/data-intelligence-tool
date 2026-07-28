@@ -42,16 +42,20 @@ async def investigate_network(device_id: str):
     try:
         # Fetch the threat record
         threats_query = f"SELECT * FROM '{THREATS_PATH}' WHERE device_id = '{device_id}'"
-        device_record = duckdb.query(threats_query).df()
+        res = duckdb.query(threats_query)
+        cols = [x[0] for x in res.description]
+        rows = res.fetchall()
         
-        if device_record.empty:
+        if not rows:
             raise HTTPException(status_code=404, detail="Device ID not flagged in the threat network.")
             
-        record = device_record.iloc[0]
+        record = dict(zip(cols, rows[0]))
         
         # Fetch up to 15 transactions
         txns_query = f"SELECT * FROM '{TXNS_PATH}' WHERE device_id = '{device_id}' LIMIT 15"
-        device_txns = duckdb.query(txns_query).df()
+        res2 = duckdb.query(txns_query)
+        cols2 = [x[0] for x in res2.description]
+        device_txns = [dict(zip(cols2, row)) for row in res2.fetchall()]
         
     except Exception as e:
         if isinstance(e, HTTPException):
@@ -61,18 +65,12 @@ async def investigate_network(device_id: str):
             detail=f"Error reading dataset via DuckDB: {str(e)}"
         )
     
-    # Parse connected_ips since parquet arrays become pandas arrays/lists
-    try:
-        connected_ips = list(record['connected_ips'])
-    except:
-        connected_ips = []
-
     # Format the data to match what the React frontend expects
     data = {
         "risk_score": int(record['risk_score']),
         "total_accounts": int(record['unique_users_count']),
         "total_value_at_risk": float(record['total_value_at_risk']),
-        "connected_ips": connected_ips,
+        "connected_ips": record.get('connected_ips', []),
         "transactions": [
             {
                 "txn_id": row['transaction_id'], 
@@ -80,7 +78,7 @@ async def investigate_network(device_id: str):
                 "amount": float(row['cart_value']), 
                 "status": "flagged" if row['is_fraud_flag'] == 1 else "cleared"
             }
-            for _, row in device_txns.iterrows()
+            for row in device_txns
         ]
     }
 
