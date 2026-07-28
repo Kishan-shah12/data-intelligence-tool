@@ -15,7 +15,8 @@ export default function Dashboard() {
     setData(null);
 
     try {
-      const response = await fetch(`https://sentinel-api-859134894750.us-central1.run.app/api/investigate/${deviceId}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/investigate/${deviceId}`);
       if (!response.ok) throw new Error("Device not found or API error.");
       const result = await response.json();
       setData(result);
