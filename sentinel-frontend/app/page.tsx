@@ -15,8 +15,7 @@ export default function Dashboard() {
     setData(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${apiUrl}/api/investigate/${deviceId}`);
+      const response = await fetch(`/api/investigate/${deviceId}`);
       if (!response.ok) throw new Error("Device not found or API error.");
       const result = await response.json();
       setData(result);
