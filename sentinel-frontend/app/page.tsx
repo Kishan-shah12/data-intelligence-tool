@@ -99,25 +99,25 @@ export default function Dashboard() {
       )}
 
       {/* Dashboard Content */}
-      {!loading && data && (
+      {!loading && data && data.network_data && (
         <div className={styles.dashboardGrid}>
           
           {/* Left Column: KPIs */}
           <div className={styles.kpiColumn}>
             <div className={styles.card}>
               <h3 className={styles.kpiLabel}>Risk Score</h3>
-              <p className={`${styles.kpiValue} ${data.risk_score > 80 ? styles.scoreDanger : data.risk_score > 50 ? styles.scoreWarning : styles.scoreSafe}`}>
-                {data.risk_score}/100
+              <p className={`${styles.kpiValue} ${data.network_data.risk_score > 80 ? styles.scoreDanger : data.network_data.risk_score > 50 ? styles.scoreWarning : styles.scoreSafe}`}>
+                {data.network_data.risk_score}/100
               </p>
             </div>
             <div className={styles.card}>
               <h3 className={styles.kpiLabel}>Connected Accounts</h3>
-              <p className={styles.kpiValue}>{data.total_accounts}</p>
+              <p className={styles.kpiValue}>{data.network_data.total_accounts}</p>
             </div>
             <div className={styles.card}>
               <h3 className={styles.kpiLabel}>Financial Exposure</h3>
               <p className={styles.kpiValue}>
-                ${data.total_value_at_risk.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                ${data.network_data.total_value_at_risk.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.transactions?.map((txn: any) => (
+                  {data.network_data.transactions?.map((txn: any) => (
                     <tr key={txn.txn_id} className={styles.txnRow}>
                       <td className={styles.mono}>{txn.txn_id.substring(0, 8)}...</td>
                       <td>{txn.user_id}</td>
